@@ -2,18 +2,20 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
-import 'package:flutter/widgets.dart';
+import 'dart:async';
 
-import '../constants/constants.dart';
+import 'package:flutter/widgets.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 /// [ChangeNotifier] for assets picker viewer.
 /// 资源选择查看器的 provider model.
-class AssetPickerViewerProvider<A> extends ChangeNotifier {
+class AssetPickerViewerProvider<A> extends AssetProvider<A> {
   /// Copy selected assets for editing when constructing.
   /// 构造时深拷贝已选择的资源集合，用于后续编辑。
   AssetPickerViewerProvider(
     List<A>? assets, {
     this.maxAssets = defaultMaxAssetsCount,
+    super.pinVideo = false,
   }) : assert(maxAssets > 0, 'maxAssets must be greater than 0.') {
     _currentlySelectedAssets = (assets ?? <A>[]).toList();
   }
@@ -41,24 +43,41 @@ class AssetPickerViewerProvider<A> extends ChangeNotifier {
 
   /// Select asset.
   /// 选中资源
-  void selectAsset(A item) {
+  @override
+  FutureOr<bool> selectAsset(A item) {
     if (currentlySelectedAssets.length == maxAssets ||
         currentlySelectedAssets.contains(item)) {
-      return;
+      return false;
     }
-    final List<A> newList = _currentlySelectedAssets.toList()..add(item);
+    final List<A> newList = _currentlySelectedAssets.toList();
+    if (pinVideo && item is AssetEntity && item.type == AssetType.video) {
+      int videoIndex = -1;
+      for (int i = 0; i < newList.length; i++) {
+        if ((newList[i] as AssetEntity).type != AssetType.video) {
+          break;
+        }
+        videoIndex = i;
+      }
+      newList.insert(videoIndex + 1, item);
+    } else {
+      newList.add(item);
+    }
     currentlySelectedAssets = newList;
+    return true;
   }
 
   /// Un-select asset.
   /// 取消选中资源
-  void unSelectAsset(A item) {
+  @override
+  FutureOr<bool> unSelectAsset(A item) {
     if (currentlySelectedAssets.isEmpty ||
         !currentlySelectedAssets.contains(item)) {
-      return;
+      return false;
     }
-    final List<A> newList = _currentlySelectedAssets.toList()..remove(item);
+    final List<A> newList = _currentlySelectedAssets.toList();
+    final bool value = newList.remove(item);
     currentlySelectedAssets = newList;
+    return value;
   }
 
   @Deprecated('Use selectAsset instead. This will be removed in 10.0.0')

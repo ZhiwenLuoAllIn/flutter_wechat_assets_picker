@@ -9,6 +9,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:wechat_assets_picker/src/provider/asset_provider.dart';
 
 import '../constants/constants.dart';
 import '../delegates/sort_path_delegate.dart';
@@ -21,11 +22,12 @@ import '../models/path_wrapper.dart';
 /// By extending it you can customize how you can get all assets or paths,
 /// how to fetch the next page of assets,
 /// and how to get the thumbnail data of a path.
-abstract class AssetPickerProvider<Asset, Path> extends ChangeNotifier {
+abstract class AssetPickerProvider<Asset, Path> extends AssetProvider<Asset> {
   AssetPickerProvider({
     this.maxAssets = defaultMaxAssetsCount,
     this.pageSize = defaultAssetsPerPage,
     this.pathThumbnailSize = defaultPathThumbnailSize,
+    super.pinVideo = false,
     List<Asset>? selectedAssets,
   })  : assert(maxAssets > 0, 'maxAssets must be greater than 0.'),
         assert(pageSize > 0, 'pageSize must be greater than 0.'),
@@ -238,21 +240,36 @@ abstract class AssetPickerProvider<Asset, Path> extends ChangeNotifier {
 
   /// Select asset.
   /// 选中资源
-  void selectAsset(Asset item) {
+  @override
+  FutureOr<bool> selectAsset(Asset item) {
     if (selectedAssets.length == maxAssets || selectedAssets.contains(item)) {
-      return;
+      return false;
     }
     final List<Asset> set = selectedAssets.toList();
-    set.add(item);
+    if (pinVideo && item is AssetEntity && item.type == AssetType.video) {
+      int videoIndex = -1;
+      for (int i = 0; i < set.length; i++) {
+        if ((set[i] as AssetEntity).type != AssetType.video) {
+          break;
+        }
+        videoIndex = i;
+      }
+      set.insert(videoIndex + 1, item);
+    } else {
+      set.add(item);
+    }
     selectedAssets = set;
+    return true;
   }
 
   /// Un-select asset.
   /// 取消选中资源
-  void unSelectAsset(Asset item) {
+  @override
+  FutureOr<bool> unSelectAsset(Asset item) {
     final List<Asset> set = selectedAssets.toList();
-    set.remove(item);
+    final bool value = set.remove(item);
     selectedAssets = set;
+    return value;
   }
 }
 
@@ -265,6 +282,7 @@ class DefaultAssetPickerProvider
     super.maxAssets,
     super.pageSize,
     super.pathThumbnailSize,
+    super.pinVideo,
     this.requestType = RequestType.image,
     this.sortPathDelegate = SortPathDelegate.common,
     this.sortPathsByModifiedDate = false,

@@ -571,7 +571,10 @@ class DefaultAssetPickerViewerBuilderDelegate
         start: 0.0,
         end: 0.0,
         height: context.bottomPadding + bottomDetailHeight,
-        child: child!,
+        child: ColoredBox(
+          color: backgroundColor ?? Colors.black,
+          child: child!,
+        ),
       ),
       child: CNP<AssetPickerViewerProvider<AssetEntity>?>.value(
         value: provider,
@@ -582,28 +585,66 @@ class DefaultAssetPickerViewerBuilderDelegate
             if (provider != null)
               ValueListenableBuilder<int>(
                 valueListenable: selectedNotifier,
-                builder: (_, int count, __) => Container(
+                builder: (_, int count, __) => SizedBox(
                   width: count > 0 ? double.maxFinite : 0,
                   height: bottomPreviewHeight,
-                  color: backgroundColor,
                   child: ListView.builder(
-                    controller: previewingListController,
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 5.0),
                     physics: const ClampingScrollPhysics(),
                     itemCount: count,
                     itemBuilder: bottomDetailItemBuilder,
                   ),
+                  // [Feverever] replace ListView.builder with ReorderableListView.builder.
+                  // child: ReorderableListView.builder(
+                  //   scrollController: previewingListController,
+                  //   scrollDirection: Axis.horizontal,
+                  //   padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  //   physics: const ClampingScrollPhysics(),
+                  //   itemCount: count,
+                  //   itemBuilder: (context, index) {
+                  //     final child = bottomDetailItemBuilder(context, index);
+                  //     final Key key = ValueKey<String>(
+                  //       provider!.currentlySelectedAssets[index].id,
+                  //     );
+                  //     return KeyedSubtree(key: key, child: child);
+                  //   },
+                  //   onReorderStart: (index) {
+                  //     HapticFeedback.lightImpact();
+                  //   },
+                  //   onReorder: (int oldIndex, int newIndex) {
+                  //     if (oldIndex < newIndex) {
+                  //         newIndex -= 1;
+                  //     }
+                  //     provider!.currentlySelectedAssets.insert(
+                  //       newIndex,
+                  //       provider!.currentlySelectedAssets.removeAt(oldIndex),
+                  //     );
+                  //     selectorProvider?.currentAssets =
+                  //         provider!.currentlySelectedAssets;
+                  //   },
+                  //   proxyDecorator: (child, index, animation) {
+                  //     return AnimatedBuilder(
+                  //       animation: animation,
+                  //       builder: (BuildContext context, Widget? child) {
+                  //         final double animValue =
+                  //             Curves.easeInOut.transform(animation.value);
+                  //         final double scale = lerpDouble(1, 1.1, animValue)!;
+                  //         return Transform.scale(
+                  //           scale: scale,
+                  //           child: child,
+                  //         );
+                  //       },
+                  //       child: child,
+                  //     );
+                  //   },
+                  // ),
                 ),
               ),
             Container(
               height: bottomBarHeight + context.bottomPadding,
               padding: const EdgeInsets.symmetric(horizontal: 20.0)
                   .copyWith(bottom: context.bottomPadding),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: themeData.canvasColor)),
-                color: backgroundColor,
-              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[

@@ -115,6 +115,7 @@ class AssetPickerDelegate {
         pathNameBuilder: pickerConfig.pathNameBuilder,
         assetsChangeCallback: pickerConfig.assetsChangeCallback,
         assetsChangeRefreshPredicate: pickerConfig.assetsChangeRefreshPredicate,
+        onAssetsSelected: pickerConfig.onAssetsSelected,
         textDelegate: pickerConfig.textDelegate,
         themeColor: pickerConfig.themeColor,
         locale: Localizations.maybeLocaleOf(context),
@@ -156,9 +157,14 @@ class AssetPickerDelegate {
         const PermissionRequestOption(),
     Key? key,
     bool useRootNavigator = true,
+    // [Feverever] newly added.
+    bool checkPermission = true,
     AssetPickerPageRouteBuilder<List<Asset>>? pageRouteBuilder,
   }) async {
-    await permissionCheck(requestOption: permissionRequestOption);
+    // [Feverever] newly added.
+    if (checkPermission) {
+      await permissionCheck(requestOption: permissionRequestOption);
+    }
     final Widget picker = AssetPicker<Asset, Path>(
       key: key,
       permissionRequestOption: permissionRequestOption,

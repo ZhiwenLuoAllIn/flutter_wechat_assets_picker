@@ -17,8 +17,11 @@ dependencies:
     path: ../
   wechat_camera_picker: ^4.2.0
 
-  extended_image: ^8.3.0
   package_info_plus: '>=5.0.0 <9.0.0'
+  extended_image:
+    git:
+      url: https://github.com/ZhiwenLuoAllIn/extended_image.git
+      ref: release # branch name
   path: ^1.8.0
   path_provider: ^2.0.15
   provider: ^6.0.2

@@ -47,6 +47,7 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     this.pathNameBuilder,
     this.assetsChangeCallback,
     this.assetsChangeRefreshPredicate,
+    this.onAssetsSelected,
     Color? themeColor,
     AssetPickerTextDelegate? textDelegate,
     Locale? locale,
@@ -61,6 +62,10 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     Singleton.textDelegate =
         textDelegate ?? assetPickerTextDelegateFromLocale(locale);
   }
+
+  /// [Additional]
+  /// If onAssetsSelected is not null, the picker ui will not dismissed by default.
+  final Function(List<Asset>)? onAssetsSelected;
 
   /// The [PermissionState] when the picker is called.
   /// 当选择器被拉起时的权限状态
@@ -752,6 +757,7 @@ class DefaultAssetPickerBuilderDelegate
     super.pathNameBuilder,
     super.assetsChangeCallback,
     super.assetsChangeRefreshPredicate,
+    super.onAssetsSelected,
     super.themeColor,
     super.textDelegate,
     super.locale,
@@ -887,8 +893,13 @@ class DefaultAssetPickerBuilderDelegate
       provider.selectedAssets.clear();
     }
     provider.selectAsset(asset);
+    // [Feverever] add a new callback function.
     if (isSingleAssetMode && !isPreviewEnabled) {
-      Navigator.maybeOf(context)?.maybePop(provider.selectedAssets);
+      if (onAssetsSelected != null) {
+        onAssetsSelected!(provider.selectedAssets);
+      } else {
+        Navigator.maybeOf(context)?.maybePop(provider.selectedAssets);
+      }
     }
   }
 
@@ -1447,13 +1458,25 @@ class DefaultAssetPickerBuilderDelegate
       AssetType.audio => audioItemBuilder(context, currentIndex, asset),
       AssetType.other => const SizedBox.shrink(),
     };
+
     final Widget content = Stack(
       key: ValueKey<String>(asset.id),
       children: <Widget>[
-        builder,
-        selectedBackdrop(context, currentIndex, asset),
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            if (isPreviewEnabled) {
+              viewAsset(context, index, asset);
+            }
+            if (isSingleAssetMode) {
+              onAssetsSelected?.call([asset]);
+            }
+          },
+          child: builder,
+        ),
         if (!isWeChatMoment || asset.type != AssetType.video)
           selectIndicator(context, index, asset),
+        selectedBackdrop(context, currentIndex, asset),
         itemBannedIndicator(context, asset),
       ],
     );
@@ -1677,7 +1700,12 @@ class DefaultAssetPickerBuilderDelegate
           ),
           onPressed: shouldAllowConfirm
               ? () {
-                  Navigator.maybeOf(context)?.maybePop(p.selectedAssets);
+                  // [Feverever] add a new callback function.
+                  if (onAssetsSelected != null) {
+                    onAssetsSelected!(provider.selectedAssets);
+                  } else {
+                    Navigator.maybeOf(context)?.maybePop(p.selectedAssets);
+                  }
                 }
               : null,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -2237,46 +2265,39 @@ class DefaultAssetPickerBuilderDelegate
     final double indicatorSize =
         MediaQuery.sizeOf(context).width / gridCount / 3;
     return Positioned.fill(
-      child: GestureDetector(
-        onTap: isPreviewEnabled
-            ? () {
-                viewAsset(context, index, asset);
-              }
-            : null,
-        child: Consumer<DefaultAssetPickerProvider>(
-          builder: (_, DefaultAssetPickerProvider p, __) {
-            final int index = p.selectedAssets.indexOf(asset);
-            final bool selected = index != -1;
-            return AnimatedContainer(
-              duration: switchingPathDuration,
-              padding: EdgeInsets.all(indicatorSize * .35),
-              color: selected
-                  ? theme.colorScheme.primary.withOpacity(.45)
-                  : theme.colorScheme.background.withOpacity(.1),
-              child: selected && !isSingleAssetMode
-                  ? Align(
-                      alignment: AlignmentDirectional.topStart,
-                      child: SizedBox(
-                        height: indicatorSize / 2.5,
-                        child: FittedBox(
-                          alignment: AlignmentDirectional.topStart,
-                          fit: BoxFit.cover,
-                          child: Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              color: theme.textTheme.bodyLarge?.color
-                                  ?.withOpacity(.75),
-                              fontWeight: FontWeight.w600,
-                              height: 1,
-                            ),
+      child: Consumer<DefaultAssetPickerProvider>(
+        builder: (_, DefaultAssetPickerProvider p, __) {
+          final int index = p.selectedAssets.indexOf(asset);
+          final bool selected = index != -1;
+          return AnimatedContainer(
+            duration: switchingPathDuration,
+            padding: EdgeInsets.all(indicatorSize * .35),
+            color: selected
+                ? theme.colorScheme.primary.withOpacity(.45)
+                : theme.colorScheme.background.withOpacity(.1),
+            child: selected && !isSingleAssetMode
+                ? Align(
+                    alignment: AlignmentDirectional.topStart,
+                    child: SizedBox(
+                      height: indicatorSize / 2.5,
+                      child: FittedBox(
+                        alignment: AlignmentDirectional.topStart,
+                        fit: BoxFit.cover,
+                        child: Text(
+                          '${index + 1}',
+                          style: TextStyle(
+                            color: theme.textTheme.bodyLarge?.color
+                                ?.withOpacity(.75),
+                            fontWeight: FontWeight.w600,
+                            height: 1,
                           ),
                         ),
                       ),
-                    )
-                  : const SizedBox.shrink(),
-            );
-          },
-        ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          );
+        },
       ),
     );
   }

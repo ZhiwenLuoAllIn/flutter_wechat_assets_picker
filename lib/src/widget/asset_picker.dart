@@ -75,6 +75,8 @@ class AssetPicker<Asset, Path> extends StatefulWidget {
     Key? key,
     AssetPickerPageRouteBuilder<List<Asset>>? pageRouteBuilder,
     bool useRootNavigator = true,
+    // [Feverever] newly added.
+    bool checkPermission = true,
   }) {
     return _pickerDelegate.pickAssetsWithDelegate<Asset, Path, PickerProvider>(
       context,
@@ -82,6 +84,8 @@ class AssetPicker<Asset, Path> extends StatefulWidget {
       delegate: delegate,
       permissionRequestOption: permissionRequestOption,
       useRootNavigator: useRootNavigator,
+      // [Feverever] newly added.
+      checkPermission: checkPermission,
       pageRouteBuilder: pageRouteBuilder,
     );
   }

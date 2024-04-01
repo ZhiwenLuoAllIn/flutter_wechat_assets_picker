@@ -1,3 +1,4 @@
+publish_to: none
 name: wechat_assets_picker
 version: 9.3.3
 description: |
@@ -11,8 +12,8 @@ topics:
   - video
   - wechat
 
-repository: https://github.com/fluttercandies/flutter_wechat_assets_picker
-issue_tracker: https://github.com/fluttercandies/flutter_wechat_assets_picker/issues
+# repository: https://github.com/fluttercandies/flutter_wechat_assets_picker
+# issue_tracker: https://github.com/fluttercandies/flutter_wechat_assets_picker/issues
 
 environment:
   sdk: ^3.2.0
@@ -24,7 +25,11 @@ dependencies:
 
   wechat_picker_library: ^1.0.5
 
-  extended_image: ^8.3.0
+  extended_image:
+    git:
+      url: https://github.com/ZhiwenLuoAllIn/extended_image.git
+      ref: release # branch name
+
   photo_manager: ^3.5.0
   photo_manager_image_provider: ^2.2.0
   provider: ^6.0.5

@@ -39,6 +39,7 @@ class AssetPickerConfig {
     this.assetsChangeCallback,
     this.assetsChangeRefreshPredicate,
     this.shouldAutoplayPreview = false,
+    this.onAssetsSelected,
   })  : assert(
           pickerTheme == null || themeColor == null,
           'pickerTheme and themeColor cannot be set at the same time.',
@@ -205,4 +206,8 @@ class AssetPickerConfig {
   /// Whether the preview should auto play.
   /// 预览是否自动播放
   final bool shouldAutoplayPreview;
+
+  /// [Additional]
+  /// If onAssetsSelected is not null, the picker ui will not dismissed by default.
+  final Function(List<AssetEntity>)? onAssetsSelected;
 }
