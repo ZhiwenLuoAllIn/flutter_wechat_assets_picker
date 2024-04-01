@@ -9,6 +9,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:wechat_assets_picker/src/provider/asset_provider.dart';
 
 import '../constants/constants.dart';
 import '../delegates/sort_path_delegate.dart';
@@ -21,7 +22,7 @@ import '../models/path_wrapper.dart';
 /// By extending it you can customize how you can get all assets or paths,
 /// how to fetch the next page of assets,
 /// and how to get the thumbnail data of a path.
-abstract class AssetPickerProvider<Asset, Path> extends ChangeNotifier {
+abstract class AssetPickerProvider<Asset, Path> extends AssetProvider<Asset> {
   AssetPickerProvider({
     this.maxAssets = defaultMaxAssetsCount,
     this.pageSize = defaultAssetsPerPage,
@@ -238,6 +239,7 @@ abstract class AssetPickerProvider<Asset, Path> extends ChangeNotifier {
 
   /// Select asset.
   /// 选中资源
+  @override
   void selectAsset(Asset item) {
     if (selectedAssets.length == maxAssets || selectedAssets.contains(item)) {
       return;
@@ -249,6 +251,7 @@ abstract class AssetPickerProvider<Asset, Path> extends ChangeNotifier {
 
   /// Un-select asset.
   /// 取消选中资源
+  @override
   void unSelectAsset(Asset item) {
     final List<Asset> set = selectedAssets.toList();
     set.remove(item);

@@ -36,6 +36,7 @@ class AssetPickerConfig {
     this.shouldRevertGrid,
     this.limitedPermissionOverlayPredicate,
     this.pathNameBuilder,
+    this.onAssetsSelected,
   })  : assert(
           pickerTheme == null || themeColor == null,
           'pickerTheme and themeColor cannot be set at the same time.',
@@ -191,4 +192,8 @@ class AssetPickerConfig {
 
   /// {@macro wechat_assets_picker.PathNameBuilder}
   final PathNameBuilder<AssetPathEntity>? pathNameBuilder;
+
+  /// [Additional]
+  /// If onAssetsSelected is not null, the picker ui will not dismissed by default.
+  final Function(List<AssetEntity>)? onAssetsSelected;
 }

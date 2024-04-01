@@ -46,6 +46,7 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     this.shouldRevertGrid,
     this.limitedPermissionOverlayPredicate,
     this.pathNameBuilder,
+    this.onAssetsSelected,
     Color? themeColor,
     AssetPickerTextDelegate? textDelegate,
     Locale? locale,
@@ -60,6 +61,10 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     Singleton.textDelegate =
         textDelegate ?? assetPickerTextDelegateFromLocale(locale);
   }
+
+  /// [Additional]
+  /// If onAssetsSelected is not null, the picker ui will not dismissed by default.
+  final Function(List<Asset>)? onAssetsSelected;
 
   /// The [PermissionState] when the picker is called.
   /// 当选择器被拉起时的权限状态
@@ -685,6 +690,7 @@ class DefaultAssetPickerBuilderDelegate
     super.shouldRevertGrid,
     super.limitedPermissionOverlayPredicate,
     super.pathNameBuilder,
+    super.onAssetsSelected,
     super.themeColor,
     super.textDelegate,
     super.locale,
@@ -812,8 +818,13 @@ class DefaultAssetPickerBuilderDelegate
       provider.selectedAssets.clear();
     }
     provider.selectAsset(asset);
+    // [Feverever] add a new callback function.
     if (isSingleAssetMode && !isPreviewEnabled) {
-      Navigator.maybeOf(context)?.maybePop(provider.selectedAssets);
+      if (onAssetsSelected != null) {
+        onAssetsSelected!(provider.selectedAssets);
+      } else {
+        Navigator.maybeOf(context)?.maybePop(provider.selectedAssets);
+      }
     }
   }
 
@@ -1526,7 +1537,12 @@ class DefaultAssetPickerBuilderDelegate
           ),
           onPressed: shouldAllowConfirm
               ? () {
-                  Navigator.maybeOf(context)?.maybePop(p.selectedAssets);
+                  // [Feverever] add a new callback function.
+                  if (onAssetsSelected != null) {
+                    onAssetsSelected!(provider.selectedAssets);
+                  } else {
+                    Navigator.maybeOf(context)?.maybePop(p.selectedAssets);
+                  }
                 }
               : null,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

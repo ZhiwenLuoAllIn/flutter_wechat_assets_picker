@@ -3,12 +3,13 @@
 // in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:wechat_assets_picker/src/provider/asset_provider.dart';
 
 import '../constants/constants.dart';
 
 /// [ChangeNotifier] for assets picker viewer.
 /// 资源选择查看器的 provider model.
-class AssetPickerViewerProvider<A> extends ChangeNotifier {
+class AssetPickerViewerProvider<A> extends AssetProvider<A> {
   /// Copy selected assets for editing when constructing.
   /// 构造时深拷贝已选择的资源集合，用于后续编辑。
   AssetPickerViewerProvider(
@@ -41,6 +42,7 @@ class AssetPickerViewerProvider<A> extends ChangeNotifier {
 
   /// Select asset.
   /// 选中资源
+  @override
   void selectAsset(A item) {
     if (currentlySelectedAssets.length == maxAssets ||
         currentlySelectedAssets.contains(item)) {
@@ -52,6 +54,7 @@ class AssetPickerViewerProvider<A> extends ChangeNotifier {
 
   /// Un-select asset.
   /// 取消选中资源
+  @override
   void unSelectAsset(A item) {
     if (currentlySelectedAssets.isEmpty ||
         !currentlySelectedAssets.contains(item)) {
