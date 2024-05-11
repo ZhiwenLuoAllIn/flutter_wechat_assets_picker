@@ -551,58 +551,58 @@ class DefaultAssetPickerViewerBuilderDelegate
       themeData.bottomAppBarTheme.color!.opacity *
           (isAppleOS(context) ? .9 : 1),
     );
-    return ValueListenableBuilder2<bool, int>(
-      firstNotifier: isDisplayingDetail,
-      secondNotifier: selectedNotifier,
-      builder: (_, bool v, __, Widget? child) => AnimatedPositionedDirectional(
-        duration: kThemeAnimationDuration,
-        curve: Curves.easeInOut,
-        bottom: v ? 0 : -(context.bottomPadding + bottomDetailHeight),
-        start: 0,
-        end: 0,
-        height: context.bottomPadding + bottomDetailHeight,
-        child: child!,
-      ),
-      child: CNP<AssetPickerViewerProvider<AssetEntity>?>.value(
-        value: provider,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            if (provider != null)
-              ValueListenableBuilder<int>(
-                valueListenable: selectedNotifier,
-                builder: (_, int count, __) => Container(
-                  width: count > 0 ? double.maxFinite : 0,
-                  height: bottomPreviewHeight,
-                  color: backgroundColor,
-                  child: ListView.builder(
-                    controller: previewingListController,
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                    physics: const ClampingScrollPhysics(),
-                    itemCount: count,
-                    itemBuilder: bottomDetailItemBuilder,
+    // [Feverever] remove the border and move the background color out.
+    return ColoredBox(
+      color: backgroundColor ?? Colors.black,
+      child: ValueListenableBuilder2<bool, int>(
+        firstNotifier: isDisplayingDetail,
+        secondNotifier: selectedNotifier,
+        builder: (_, bool v, __, Widget? child) =>
+            AnimatedPositionedDirectional(
+          duration: kThemeAnimationDuration,
+          curve: Curves.easeInOut,
+          bottom: v ? 0 : -(context.bottomPadding + bottomDetailHeight),
+          start: 0,
+          end: 0,
+          height: context.bottomPadding + bottomDetailHeight,
+          child: child!,
+        ),
+        child: CNP<AssetPickerViewerProvider<AssetEntity>?>.value(
+          value: provider,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              if (provider != null)
+                ValueListenableBuilder<int>(
+                  valueListenable: selectedNotifier,
+                  builder: (_, int count, __) => SizedBox(
+                    width: count > 0 ? double.maxFinite : 0,
+                    height: bottomPreviewHeight,
+                    child: ListView.builder(
+                      controller: previewingListController,
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      physics: const ClampingScrollPhysics(),
+                      itemCount: count,
+                      itemBuilder: bottomDetailItemBuilder,
+                    ),
                   ),
                 ),
+              Container(
+                height: bottomBarHeight + context.bottomPadding,
+                padding: const EdgeInsets.symmetric(horizontal: 20.0)
+                    .copyWith(bottom: context.bottomPadding),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    if (provider != null || isWeChatMoment)
+                      confirmButton(context),
+                  ],
+                ),
               ),
-            Container(
-              height: bottomBarHeight + context.bottomPadding,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0)
-                  .copyWith(bottom: context.bottomPadding),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: themeData.canvasColor)),
-                color: backgroundColor,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  if (provider != null || isWeChatMoment)
-                    confirmButton(context),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
