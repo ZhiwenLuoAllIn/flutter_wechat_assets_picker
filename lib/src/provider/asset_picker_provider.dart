@@ -240,22 +240,24 @@ abstract class AssetPickerProvider<Asset, Path> extends AssetProvider<Asset> {
   /// Select asset.
   /// 选中资源
   @override
-  void selectAsset(Asset item) {
+  bool selectAsset(Asset item) {
     if (selectedAssets.length == maxAssets || selectedAssets.contains(item)) {
-      return;
+      return false;
     }
     final List<Asset> set = selectedAssets.toList();
     set.add(item);
     selectedAssets = set;
+    return true;
   }
 
   /// Un-select asset.
   /// 取消选中资源
   @override
-  void unSelectAsset(Asset item) {
+  bool unSelectAsset(Asset item) {
     final List<Asset> set = selectedAssets.toList();
-    set.remove(item);
+    final bool value = set.remove(item);
     selectedAssets = set;
+    return value;
   }
 }
 

@@ -43,25 +43,28 @@ class AssetPickerViewerProvider<A> extends AssetProvider<A> {
   /// Select asset.
   /// 选中资源
   @override
-  void selectAsset(A item) {
+  bool selectAsset(A item) {
     if (currentlySelectedAssets.length == maxAssets ||
         currentlySelectedAssets.contains(item)) {
-      return;
+      return false;
     }
     final List<A> newList = _currentlySelectedAssets.toList()..add(item);
     currentlySelectedAssets = newList;
+    return true;
   }
 
   /// Un-select asset.
   /// 取消选中资源
   @override
-  void unSelectAsset(A item) {
+  bool unSelectAsset(A item) {
     if (currentlySelectedAssets.isEmpty ||
         !currentlySelectedAssets.contains(item)) {
-      return;
+      return false;
     }
-    final List<A> newList = _currentlySelectedAssets.toList()..remove(item);
+    final List<A> newList = _currentlySelectedAssets.toList();
+    final bool value = newList.remove(item);
     currentlySelectedAssets = newList;
+    return value;
   }
 
   @Deprecated('Use selectAsset instead. This will be removed in 10.0.0')
