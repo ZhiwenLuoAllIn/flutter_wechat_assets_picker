@@ -1009,8 +1009,7 @@ class DefaultAssetPickerBuilderDelegate
               children: <Widget>[
                 Positioned.fill(child: assetsGridBuilder(context)),
                 if (isPreviewEnabled || !isSingleAssetMode)
-                  // [Feverever] remove [Positioned.fill].
-                  bottomActionBar(context),
+                  Positioned.fill(child: bottomActionBar(context)),
               ],
             ),
           ),
