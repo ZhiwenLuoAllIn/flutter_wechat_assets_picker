@@ -1009,7 +1009,7 @@ class DefaultAssetPickerBuilderDelegate
               children: <Widget>[
                 Positioned.fill(child: assetsGridBuilder(context)),
                 if (isPreviewEnabled || !isSingleAssetMode)
-                  Positioned.fill(child: bottomActionBar(context)),
+                  Positioned.fill(top: null, child: bottomActionBar(context)),
               ],
             ),
           ),
