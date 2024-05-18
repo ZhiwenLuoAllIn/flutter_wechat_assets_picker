@@ -579,13 +579,24 @@ class DefaultAssetPickerViewerBuilderDelegate
                 builder: (_, int count, __) => SizedBox(
                   width: count > 0 ? double.maxFinite : 0,
                   height: bottomPreviewHeight,
-                  child: ListView.builder(
-                    controller: previewingListController,
+                  child: ReorderableListView.builder(
+                    scrollController: previewingListController,
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 5.0),
                     physics: const ClampingScrollPhysics(),
                     itemCount: count,
                     itemBuilder: bottomDetailItemBuilder,
+                    onReorderStart: (index) {
+                      HapticFeedback.lightImpact();
+                    },
+                    onReorder: (int oldIndex, int newIndex) {
+                      provider!.currentlySelectedAssets.insert(
+                        newIndex,
+                        provider!.currentlySelectedAssets.removeAt(oldIndex),
+                      );
+                      selectorProvider?.currentAssets =
+                          provider!.currentlySelectedAssets;
+                    },
                   ),
                 ),
               ),
