@@ -585,7 +585,13 @@ class DefaultAssetPickerViewerBuilderDelegate
                     padding: const EdgeInsets.symmetric(horizontal: 5.0),
                     physics: const ClampingScrollPhysics(),
                     itemCount: count,
-                    itemBuilder: bottomDetailItemBuilder,
+                    itemBuilder: (context, index) {
+                      final child = bottomDetailItemBuilder(context, index);
+                      final Key key = ValueKey<String>(
+                        provider!.currentlySelectedAssets[index].id,
+                      );
+                      return KeyedSubtree(key: key, child: child);
+                    },
                     onReorderStart: (index) {
                       HapticFeedback.lightImpact();
                     },
