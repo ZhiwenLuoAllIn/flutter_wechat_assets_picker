@@ -3,9 +3,7 @@
 // in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-import 'package:wechat_assets_picker/src/provider/asset_provider.dart';
-
-import '../constants/constants.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 /// [ChangeNotifier] for assets picker viewer.
 /// 资源选择查看器的 provider model.
@@ -15,6 +13,7 @@ class AssetPickerViewerProvider<A> extends AssetProvider<A> {
   AssetPickerViewerProvider(
     List<A>? assets, {
     this.maxAssets = defaultMaxAssetsCount,
+    super.pinVideo = false,
   }) : assert(maxAssets > 0, 'maxAssets must be greater than 0.') {
     _currentlySelectedAssets = (assets ?? <A>[]).toList();
   }
@@ -48,7 +47,19 @@ class AssetPickerViewerProvider<A> extends AssetProvider<A> {
         currentlySelectedAssets.contains(item)) {
       return false;
     }
-    final List<A> newList = _currentlySelectedAssets.toList()..add(item);
+    final List<A> newList = _currentlySelectedAssets.toList();
+    if (pinVideo && item is AssetEntity && item.type == AssetType.video) {
+      int videoIndex = -1;
+      for (int i = 0; i < newList.length; i++) {
+        if ((newList[i] as AssetEntity).type != AssetType.video) {
+          break;
+        }
+        videoIndex = i;
+      }
+      newList.insert(videoIndex + 1, item);
+    } else {
+      newList.add(item);
+    }
     currentlySelectedAssets = newList;
     return true;
   }

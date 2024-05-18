@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 /// provider and viewer provider together.
 /// The returned boolean value represent the operation success or not.
 abstract class AssetProvider<Asset> extends ChangeNotifier {
+  AssetProvider({required this.pinVideo});
+
+  bool pinVideo;
+
   bool selectAsset(Asset item);
   bool unSelectAsset(Asset item);
 }

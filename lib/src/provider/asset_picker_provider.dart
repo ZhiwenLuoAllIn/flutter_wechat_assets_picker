@@ -27,6 +27,7 @@ abstract class AssetPickerProvider<Asset, Path> extends AssetProvider<Asset> {
     this.maxAssets = defaultMaxAssetsCount,
     this.pageSize = defaultAssetsPerPage,
     this.pathThumbnailSize = defaultPathThumbnailSize,
+    super.pinVideo = false,
     List<Asset>? selectedAssets,
   })  : assert(maxAssets > 0, 'maxAssets must be greater than 0.'),
         assert(pageSize > 0, 'pageSize must be greater than 0.'),
@@ -245,7 +246,18 @@ abstract class AssetPickerProvider<Asset, Path> extends AssetProvider<Asset> {
       return false;
     }
     final List<Asset> set = selectedAssets.toList();
-    set.add(item);
+    if (pinVideo && item is AssetEntity && item.type == AssetType.video) {
+      int videoIndex = -1;
+      for (int i = 0; i < set.length; i++) {
+        if ((set[i] as AssetEntity).type != AssetType.video) {
+          break;
+        }
+        videoIndex = i;
+      }
+      set.insert(videoIndex + 1, item);
+    } else {
+      set.add(item);
+    }
     selectedAssets = set;
     return true;
   }
@@ -270,6 +282,7 @@ class DefaultAssetPickerProvider
     super.maxAssets,
     super.pageSize,
     super.pathThumbnailSize,
+    super.pinVideo,
     this.requestType = RequestType.image,
     this.sortPathDelegate = SortPathDelegate.common,
     this.sortPathsByModifiedDate = false,
