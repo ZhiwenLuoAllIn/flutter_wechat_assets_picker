@@ -579,31 +579,57 @@ class DefaultAssetPickerViewerBuilderDelegate
                 builder: (_, int count, __) => SizedBox(
                   width: count > 0 ? double.maxFinite : 0,
                   height: bottomPreviewHeight,
-                  child: ReorderableListView.builder(
-                    scrollController: previewingListController,
+                  child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 5.0),
                     physics: const ClampingScrollPhysics(),
                     itemCount: count,
-                    itemBuilder: (context, index) {
-                      final child = bottomDetailItemBuilder(context, index);
-                      final Key key = ValueKey<String>(
-                        provider!.currentlySelectedAssets[index].id,
-                      );
-                      return KeyedSubtree(key: key, child: child);
-                    },
-                    onReorderStart: (index) {
-                      HapticFeedback.lightImpact();
-                    },
-                    onReorder: (int oldIndex, int newIndex) {
-                      provider!.currentlySelectedAssets.insert(
-                        newIndex,
-                        provider!.currentlySelectedAssets.removeAt(oldIndex),
-                      );
-                      selectorProvider?.currentAssets =
-                          provider!.currentlySelectedAssets;
-                    },
+                    itemBuilder: bottomDetailItemBuilder,
                   ),
+                  // [Feverever] replace ListView.builder with ReorderableListView.builder.
+                  // child: ReorderableListView.builder(
+                  //   scrollController: previewingListController,
+                  //   scrollDirection: Axis.horizontal,
+                  //   padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  //   physics: const ClampingScrollPhysics(),
+                  //   itemCount: count,
+                  //   itemBuilder: (context, index) {
+                  //     final child = bottomDetailItemBuilder(context, index);
+                  //     final Key key = ValueKey<String>(
+                  //       provider!.currentlySelectedAssets[index].id,
+                  //     );
+                  //     return KeyedSubtree(key: key, child: child);
+                  //   },
+                  //   onReorderStart: (index) {
+                  //     HapticFeedback.lightImpact();
+                  //   },
+                  //   onReorder: (int oldIndex, int newIndex) {
+                  //     if (oldIndex < newIndex) {
+                  //         newIndex -= 1;
+                  //     }
+                  //     provider!.currentlySelectedAssets.insert(
+                  //       newIndex,
+                  //       provider!.currentlySelectedAssets.removeAt(oldIndex),
+                  //     );
+                  //     selectorProvider?.currentAssets =
+                  //         provider!.currentlySelectedAssets;
+                  //   },
+                  //   proxyDecorator: (child, index, animation) {
+                  //     return AnimatedBuilder(
+                  //       animation: animation,
+                  //       builder: (BuildContext context, Widget? child) {
+                  //         final double animValue =
+                  //             Curves.easeInOut.transform(animation.value);
+                  //         final double scale = lerpDouble(1, 1.1, animValue)!;
+                  //         return Transform.scale(
+                  //           scale: scale,
+                  //           child: child,
+                  //         );
+                  //       },
+                  //       child: child,
+                  //     );
+                  //   },
+                  // ),
                 ),
               ),
             Container(
