@@ -28,7 +28,7 @@ dependencies:
   extended_image:
     git:
       url: https://github.com/ZhiwenLuoAllIn/extended_image.git
-      ref: release # branch name
+      ref: '2d8ad2d' # branch name
 
   photo_manager: ^3.5.0
   photo_manager_image_provider: ^2.2.0
